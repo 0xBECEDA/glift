@@ -6,7 +6,7 @@ Make sure you have the following installed:
 
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
-- [GoLang 1.20+](https://go.dev/doc/install)
+- [GoLang 1.23+](https://go.dev/doc/install)
 ---
 
 ## 🚀 Running the App
