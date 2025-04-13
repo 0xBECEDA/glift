@@ -36,7 +36,7 @@ func TestDriver_WithDockerCompose(t *testing.T) {
 
 	time.Sleep(5 * time.Second)
 
-	dsn := "postgres://postgres:password@localhost:5432/postgres?sslmode=disable"
+	dsn := "postgres://postgres:password@localhost:5433/postgres?sslmode=disable"
 
 	logger := zap.NewNop()
 	driver, err := NewDriver(logger, dsn)
