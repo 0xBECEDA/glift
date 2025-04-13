@@ -4,8 +4,8 @@
 
 Make sure you have the following installed:
 
-- [Docker](https://www.docker.com/)
-- [Docker Compose](https://docs.docker.com/compose/)
+- [Docker 1.28+](https://www.docker.com/)
+- [Docker Compose 2.31+](https://docs.docker.com/compose/)
 - [GoLang 1.23+](https://go.dev/doc/install)
 ---
 
