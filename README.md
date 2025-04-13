@@ -4,9 +4,16 @@
 
 Make sure you have the following installed:
 
-- [Docker 1.20+](https://www.docker.com/)
+- [Docker 1.26+](https://www.docker.com/)
 - [Docker Compose v2.3+ or v1.19+](https://docs.docker.com/compose/)
 - [GoLang 1.23.6+](https://go.dev/doc/install)
+
+Following app is tested with setup:
+- linux ubuntu 24.0
+- go v1.23.6
+- docker v1.28
+- docker compose v2.31.0
+
 ## 🚀 Running the App
 ### Running with docker (preferred)
 To build the docker image, run postgres:13 instance and run the application:
