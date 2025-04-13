@@ -1,8 +1,8 @@
-version: "3.9"
+version: "3"
 
 services:
   postgres:
-    image: postgres:15
+    image: postgres:13
     container_name: postgres
     environment:
       POSTGRES_USER: postgres

@@ -4,26 +4,52 @@
 
 Make sure you have the following installed:
 
-- [Docker 1.28+](https://www.docker.com/)
-- [Docker Compose 2.31+](https://docs.docker.com/compose/)
-- [GoLang 1.23+](https://go.dev/doc/install)
----
-
+- [Docker 1.20+](https://www.docker.com/)
+- [Docker Compose v2.3+ or v1.19+](https://docs.docker.com/compose/)
+- [GoLang 1.23.6+](https://go.dev/doc/install)
 ## 🚀 Running the App
-
-To build the Docker image and run the application:
-
+### Running with docker (preferred)
+To build the docker image, run postgres:13 instance and run the application:
 ```bash
-make run
+make docker-run
 ```
-
-By default, the app listens on port `8080` and connects to the **Calibration** testnet.
+> ⚠️ If port 5433 is busy on your host, set up POSTGRES_PORT env variable to desired postgres port.
+>   By default server listens 8080 port. It supports connections only to the **Calibration** testnet.
 
 To stop the app:
 
 ```bash
-make stop
+make docker-stop
 ```
+
+### Running locally
+If you run application in docker before, please make down containers first by **make docker-stop** 
+
+This command builds and runs the app locally with environment variables:
+```bash
+make local-run
+```
+- Starts the `postgres` service via Docker Compose
+- Installs Go dependencies
+- Builds the binary to `bin/main`
+- Runs the app with environment variables
+
+#### 🌱 Default environment variables:
+
+| Variable              | Default Value                                                                             |
+|-----------------------|--------------------------------------------------------------------------------------------|
+| `CHAIN_ID`            | `testnet`                                                                                 |
+| `POSTGRES_PORT`       | `5433`                                                                                     |
+| `DATABASE_DSN`        | `postgres://postgres:password@localhost:$(POSTGRES_PORT)/postgres?sslmode=disable`        |
+| `SERVER_LISTEN_ADDR`  | `:8080`                                                                                    |
+
+Override like this:
+
+```bash
+POSTGRES_PORT=5432 make local-run
+```
+> ⚠️ Do not change CHAIN_ID: only calibrationnet is supported.
+
 
 ## 🛠️ API Usage
 
@@ -54,7 +80,10 @@ curl -X POST http://localhost:8080/transaction/send \
 }'
 ```
 
-If successful, the response will include the transaction hash.
+Success response:
+```json
+{"hash":"0x15e54e2f6e60be523a4ef44e3dc3ab7245bdc98d8b007bfcf1628a320983384b"}
+```
 
 ### 🕒 Transaction Status Tracking
 
@@ -75,10 +104,23 @@ This limitation can be resolved in the future by adding a background worker or b
 ```bash
 curl -X GET "http://localhost:8080/transactions/?sender=0xSenderAddressHere&receiver=0xReceiverAddressHere"
 ```
+Success response:
+```json
+[
+  {
+    "ID": 1,
+    "Hash": "0xexamplehash000000000000000000000000000000000000000000000000000000",
+    "Sender": "0xexampleSenderAddress0000000000000000000000000000",
+    "Receiver": "0xexampleReceiverAddress000000000000000000000000",
+    "Amount": "20000",
+    "Timestamp": "2025-04-13T13:04:46.754419Z",
+    "Status": "pending"
+  }
+]
+```
 
-- Both `sender` and `receiver` are optional.
-- Address matching is **case-insensitive**.
-- If neither is provided, the endpoint returns **up to 100** recent transactions.
+- Both `sender` and `receiver` are optional. If no of them provided, endpoint returns **up to 100** transactions. 
+- Address matching is not **case-insensitive**.
 
 ### 💰 Check Wallet Balance
 
@@ -86,10 +128,13 @@ curl -X GET "http://localhost:8080/transactions/?sender=0xSenderAddressHere&rece
 curl -X GET "http://localhost:8080/balance/your_address_here"
 ```
 
-If successful, the response will include the **FIL** and **iFIL** balances of the specified address.
+Success response:
+```json
+{"fil":"1","ifil":"2"}
+```
 
 ## 🧪 Testing
-
+Tests are using **testcontainers**, make sure docker containers running by **make docker-run** is down.
 To run all tests:
 
 ```bash
