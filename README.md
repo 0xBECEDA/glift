@@ -1,37 +1,50 @@
-# How to run
-## Prerequisites
-You have installed:
-- Docker and Docker Compose
+# 🧾 How to Run
 
-## Running app
-To build docker image and run app using docker, use:
-```shell
+## ✅ Prerequisites
+
+Make sure you have the following installed:
+
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
+- [GoLang 1.20+](https://go.dev/doc/install)
+---
+
+## 🚀 Running the App
+
+To build the Docker image and run the application:
+
+```bash
 make run
 ```
-By default, app will listen for requests on `8080` port and use **calibrationnet.** 
 
-To stop app:
-```shell
+By default, the app listens on port `8080` and connects to the **Calibration** testnet.
+
+To stop the app:
+
+```bash
 make stop
 ```
-## API usage
+
+## 🛠️ API Usage
+
 ### ⚠️ Security Notice
 
 This implementation accepts a raw private key from the client to sign and send a transaction.  
 This approach is **NOT SECURE** and should **never be used in production**.
 
-In a real-world application, **I would not transmit private keys over the network**, especially not in plaintext.  
+In a real-world application, **I would never transmit private keys over the network**, especially not in plaintext.  
 Instead, I would recommend one of the following secure alternatives:
 
 1. ✅ Let the client **sign the transaction locally** and submit the signed transaction.
-2. 🔐 Use a **Web3 wallet** (e.g., MetaMask) with **WalletConnect** or similar bridge protocol.
+2. 🔐 Use a **Web3 wallet** (e.g., MetaMask) with **WalletConnect** or a similar bridge protocol.
 3. 💾 Integrate with a **hardware wallet** or signing service (e.g., Ledger, Fireblocks).
 4. 🧰 For backend automation, use a **secure signer** stored in a Vault or HSM (e.g., AWS KMS, HashiCorp Vault).
 
-> ⚠️ The current implementation was chosen **only due to time constraints** and the need to demonstrate a complete flow in a single backend service.
+> ⚠️ This insecure method was chosen **only due to time constraints** to demonstrate a complete backend flow.
 
-Send transaction:
-```
+### 📤 Send Transaction
+
+```bash
 curl -X POST http://localhost:8080/transaction/send \
   -H "Content-Type: application/json" \
   -d '{
@@ -40,54 +53,64 @@ curl -X POST http://localhost:8080/transaction/send \
     "amount": "1000000000000000000"
 }'
 ```
-In case of success you would get transaction hash.
-⚠️ Transaction Status Tracking
 
-At the moment, this application **does not scan the blockchain to track the status of submitted transactions**.
+If successful, the response will include the transaction hash.
+
+### 🕒 Transaction Status Tracking
+
+Currently, this application **does not scan the blockchain to track the status of submitted transactions**.
 
 As a result:
 
-- All submitted transactions are stored in the database with a `pending` status
-- The status is **not updated** after submission, even if the transaction is later confirmed or failed on-chain
+- All submitted transactions are stored in the database with a `pending` status.
+- The status is **never updated**, even if the transaction is later confirmed or fails on-chain.
 
-This is a known limitation and can be improved in the future by integrating a background job or blockchain event listener to update transaction statuses.
-In case if transaction status check needed, use  [explorer](https://filfox.info/en). Do not forget, that transactions are sent in **calibrationnet**.
+This limitation can be resolved in the future by adding a background worker or blockchain event listener to keep transaction statuses up to date.
 
+> If transaction status tracking is needed, please check manually via [Filfox Explorer](https://filfox.info/en).  
+> Remember that transactions are submitted on the **Calibration testnet**.
 
-Get transactions from database:
-```curl -X GET "http://localhost:8080/transactions/?sender=0xSenderAddressHere&receiver=0xReceiverAddressHere"```
+### 📄 Get Transactions from Database
 
-- Both sender and receiver are optional
-- Address matching is not case-sensitive
-- If neither sender nor receiver is provided, the endpoint will return all transactions, up to a maximum of 100 entries
+```bash
+curl -X GET "http://localhost:8080/transactions/?sender=0xSenderAddressHere&receiver=0xReceiverAddressHere"
+```
 
-Check balance of wallet:
-```curl -X GET "http://localhost:8080/balance/your_address_here" ```
-In case of success you would get balances of FIL and IFIL of your address.
+- Both `sender` and `receiver` are optional.
+- Address matching is **case-insensitive**.
+- If neither is provided, the endpoint returns **up to 100** recent transactions.
 
-# Testing
+### 💰 Check Wallet Balance
+
+```bash
+curl -X GET "http://localhost:8080/balance/your_address_here"
+```
+
+If successful, the response will include the **FIL** and **iFIL** balances of the specified address.
+
+## 🧪 Testing
+
 To run all tests:
 
-```shell
+```bash
 make test
 ```
 
-# 🚀 What Would Be Improved in a Real-World Scenario
+## 🚀 What Would Be Improved in a Real-World Scenario
 
 If this were a production-grade application, I would implement the following improvements:
 
 - 🔐 **No raw private keys in API requests**  
-  As mentioned above, I would never accept raw private keys from clients over the network. Instead, I would rely on client-side signing using wallets like MetaMask, WalletConnect, or hardware wallets, or securely integrate with custodial solutions (e.g., Vault, Fireblocks).
+  As mentioned above, raw private keys should never be transmitted over the network. Instead, signing should happen on the client side or via secure systems.
 
 - 📡 **Transaction status tracking via event listener**  
-  A blockchain event listener or polling mechanism would be implemented to monitor the status of submitted transactions and update them in the database accordingly (e.g., from `pending` to `confirmed` or `failed`).
+  A background job or blockchain event listener would track the status of each transaction and update it in the database accordingly.
 
 - ⚙️ **Flexible configuration management**  
-  The application would support loading configuration from a file (e.g., `config.yaml` or `config.json`) in addition to environment variables, allowing for better manageability and separation of concerns.
+  The app would support loading config values from a file (e.g., `config.yaml`) in addition to environment variables.
 
 - 📚 **Auto-generated API documentation using Swagger**  
-  I would document the API using [Swagger](https://swagger.io/) (e.g., with `swaggo/swag`), enabling users and developers to easily understand and interact with the available endpoints.
+  API endpoints would be documented with [Swagger](https://swagger.io/) (e.g., using `swaggo/swag`) to provide an interactive developer experience.
 
 - ✅ **More tests with diverse scenarios**  
-  I would expand test coverage to include a broader range of unit and integration tests, covering edge cases, invalid input, database errors, and blockchain interaction failure scenarios.
-
+  The test suite would be extended to include edge cases, failure simulations, invalid inputs, database errors, and blockchain response handling.
