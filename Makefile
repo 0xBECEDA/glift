@@ -12,4 +12,4 @@ stop:
 	docker compose down
 
 test:
-	go test ./...
+	go test ./... -v

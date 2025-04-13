@@ -26,13 +26,13 @@ func TestDriver_WithDockerCompose(t *testing.T) {
 	absComposePath, err := filepath.Abs(composePath)
 	require.NoError(t, err, "failed to get absolute path to docker-compose.yml")
 
-	compose, err := compose.NewDockerCompose(absComposePath)
+	composeProject, err := compose.NewDockerCompose(absComposePath)
 	require.NoError(t, err)
 
-	err = compose.Up(ctx)
+	err = composeProject.Up(ctx, compose.RunServices("postgres"))
 	require.NoError(t, err)
 
-	t.Cleanup(func() { compose.Down(ctx) })
+	t.Cleanup(func() { composeProject.Down(ctx) })
 
 	time.Sleep(5 * time.Second)
 
